@@ -10,3 +10,6 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 add_executable(main src/main.cc)
 target_link_libraries(main ${OpenCV_LIBS})
+
+add_executable(tutorial src/tutorial.cc)
+target_link_libraries(tutorial ${OpenCV_LIBS})
