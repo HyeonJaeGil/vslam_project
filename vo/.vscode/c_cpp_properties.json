@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "/home/hj/cpp-cv-project-template/third_party/opencv/install/include/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64",
+            "browse": {
+                "path": [
+                    "/home/hj/cpp-cv-project-template/third_party/opencv/install/include"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}
