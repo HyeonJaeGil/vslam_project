@@ -20,8 +20,12 @@ Hand written function time passed in seconds: 0.00233336
 Built-in filter2D time passed in seconds:     0.00104528
 */
 
-void Sharpen(const Mat& myImage,Mat& Result);
-
+// Declare the variables
+Mat src, dst;
+int top, bottom, left, right;
+int borderType = BORDER_CONSTANT;
+const char* window_name = "copyMakeBorder Demo";
+RNG rng(12345);
 
 int main( int argc, char* argv[])
 {
@@ -35,49 +39,27 @@ int main( int argc, char* argv[])
         std::cerr << "Can't open image " << std::endl;
         return EXIT_FAILURE;
     }
-    namedWindow("Input", WINDOW_AUTOSIZE);
-    namedWindow("Output", WINDOW_AUTOSIZE);
-    imshow( "Input", src );
 
-    double t = (double)getTickCount();
-    Sharpen( src, dst0 );
-    t = ((double)getTickCount() - t)/getTickFrequency();
-    cout << "Hand written function time passed in seconds: " << t << endl;
-    imshow( "Output", dst0 );
+    Point2f srcTri[3];
+    srcTri[0] = Point2f( 0.f, 0.f );
+    srcTri[1] = Point2f( src.cols - 1.f, 0.f );
+    srcTri[2] = Point2f( 0.f, src.rows - 1.f );
+    Point2f dstTri[3];
+    dstTri[0] = Point2f( 0.f, src.rows*0.33f );
+    dstTri[1] = Point2f( src.cols*0.85f, src.rows*0.25f );
+    dstTri[2] = Point2f( src.cols*0.15f, src.rows*0.7f );
+    Mat warp_mat = getAffineTransform( srcTri, dstTri );
+    Mat warp_dst = Mat::zeros( src.rows, src.cols, src.type() );
+    warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
+    Point center = Point( warp_dst.cols/2, warp_dst.rows/2 );
+    double angle = -50.0;
+    double scale = 0.6;
+    Mat rot_mat = getRotationMatrix2D( center, angle, scale );
+    Mat warp_rotate_dst;
+    warpAffine( warp_dst, warp_rotate_dst, rot_mat, warp_dst.size() );
+    imshow( "Source image", src );
+    imshow( "Warp", warp_dst );
+    imshow( "Warp + Rotate", warp_rotate_dst );
     waitKey();
-    
-    Mat kernel = (Mat_<char>(3,3) <<  0, -1,  0,
-                                   -1,  5, -1,
-                                    0, -1,  0);
-    t = (double)getTickCount();
-    filter2D( src, dst1, src.depth(), kernel );
-    t = ((double)getTickCount() - t)/getTickFrequency();
-    cout << "Built-in filter2D time passed in seconds:     " << t << endl;
-    imshow( "Output", dst1 );
-    waitKey();
-    return EXIT_SUCCESS;
-}
-
-
-void Sharpen(const Mat& myImage,Mat& Result)
-{
-    CV_Assert(myImage.depth() == CV_8U);  // accept only uchar images
-    const int nChannels = myImage.channels();
-    Result.create(myImage.size(),myImage.type());
-    for(int j = 1 ; j < myImage.rows-1; ++j)
-    {
-        const uchar* previous = myImage.ptr<uchar>(j - 1);
-        const uchar* current  = myImage.ptr<uchar>(j    );
-        const uchar* next     = myImage.ptr<uchar>(j + 1);
-        uchar* output = Result.ptr<uchar>(j);
-        for(int i= nChannels;i < nChannels*(myImage.cols-1); ++i)
-        {
-            *output++ = saturate_cast<uchar>(5*current[i]
-                         -current[i-nChannels] - current[i+nChannels] - previous[i] - next[i]);
-        }
-    }
-    Result.row(0).setTo(Scalar(0));
-    Result.row(Result.rows-1).setTo(Scalar(0));
-    Result.col(0).setTo(Scalar(0));
-    Result.col(Result.cols-1).setTo(Scalar(0));
+    return 0;
 }
