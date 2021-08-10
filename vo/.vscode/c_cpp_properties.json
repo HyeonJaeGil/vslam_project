@@ -13,7 +13,7 @@
             "intelliSenseMode": "linux-clang-x64",
             "browse": {
                 "path": [
-                    "/home/hj/cpp-cv-project-template/third_party/opencv/install/include"
+                    // "/home/hj/cpp-cv-project-template/third_party/opencv/install/include"
                 ]
             }
         }
